@@ -49,8 +49,10 @@ if __name__ == "__main__":
     output_lod = []
     for n, toctext_span in enumerate(all_toctext_spans):
         print(toctext_span.get_text())
-        output_dict = {"Section": toctext_span.get_text(), "Input_URL": url}
-        output_lod.append(output_dict)
+        output_lod.append({
+            "Section": toctext_span.get_text(),
+            "Input_URL": url
+        })
 
     if args.export:
         with open('output.csv', 'w') as output_file:
