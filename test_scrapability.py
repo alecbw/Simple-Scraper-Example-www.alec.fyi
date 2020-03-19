@@ -19,10 +19,13 @@ def request_site(url):
         url = url.split("www.", 1)[1]
 
     url = "https://" + url
+
     response = requests.get(url, headers=headers)
+
     if response.status_code not in [200, 202, 301, 302]:
         print(f"Failed request; status code is: {response.status_code}")
         return None
+
     parsed = BeautifulSoup(response.content, "html.parser")
     return parsed
 
