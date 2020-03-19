@@ -31,9 +31,13 @@ def request_site(url):
 
 
 if __name__ == "__main__":
+
     parsed = request_site("https://en.wikipedia.org/wiki/Outline_of_science")
+
     containing_div = parsed.find("div", {"id": "toc"})
+
     all_toctext_spans = containing_div.find_all("span", {"class": "toctext"})
+
     for toctext_span in all_toctext_spans:
-      print(toctext_span.get_text())
+        print(toctext_span.get_text())
 
