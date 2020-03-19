@@ -1,5 +1,11 @@
 from bs4 import BeautifulSoup, element, NavigableString
 import requests
+import csv
+import argparse
+
+argparser = argparse.ArgumentParser()
+argparser.add_argument('-export', nargs='?', help="If you want the program to export the data to CSV")
+args = argparser.parse_args()
 
 def request_site(url):
     # Spoof a typical browser header. HTTP Headers are case-insensitive.
@@ -32,12 +38,23 @@ def request_site(url):
 
 if __name__ == "__main__":
 
-    parsed = request_site("https://en.wikipedia.org/wiki/Outline_of_science")
+    url = "https://en.wikipedia.org/wiki/Outline_of_science"
+
+    parsed = request_site(url)
 
     containing_div = parsed.find("div", {"id": "toc"})
 
     all_toctext_spans = containing_div.find_all("span", {"class": "toctext"})
 
-    for toctext_span in all_toctext_spans:
+    output_lod = []
+    for n, toctext_span in enumerate(all_toctext_spans):
         print(toctext_span.get_text())
+        output_dict = {"Section": toctext_span.get_text(), "Input_URL": url}
+        output_lod.append(output_dict)
 
+    if args.export:
+        with open('output.csv', 'w') as output_file:
+            dict_writer = csv.DictWriter(output_file, output_lod[0].keys())
+            dict_writer.writeheader()
+            dict_writer.writerows(output_lod)
+            print("Finished writing data to output.csv")
