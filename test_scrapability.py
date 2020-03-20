@@ -61,24 +61,3 @@ if __name__ == "__main__":
             dict_writer.writeheader()
             dict_writer.writerows(output_lod)
             print("Finished writing data to output.csv")
-
-
-for n, row in enumerate(parsed.body.find_all('tr')):
-    for a in row.find_all('a', href=True):
-        if not a.contents:
-            continue
-        Result_Contents = str(a.contents[0].encode('utf-8').strip())
-        if "<" not in Result_Contents and "read more reviews" not in Result_Contents:
-            ws2["A" + str(Row_Number)] = a.contents[0]
-            ws2["B" + str(Row_Number)] = a['href']
-review_table_delimiters = ["Member Since:", "Feedback Score:", "Positive Feedback:","Star Rating:"]
-try:
-    review_table = parsed.find("div", {"class": "layout-unit layout-1of3"})
-    for delim in review_table_delimiters:
-        if delim in str(review_table):
-            if delim == "Member Since:":
-                ws2["O" + str(Row_Number)] = review_table.text.split(delim)[1].strip()
-except AttributeError:
-    Pass
-
-
