@@ -33,7 +33,6 @@ def request_site(url):
         return None
 
     parsed = BeautifulSoup(response.content, "html.parser")
-    print(parsed)
     return parsed
 
 
