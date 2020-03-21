@@ -253,10 +253,4 @@ def safely_get_text(parsed, html_type, property_type, identifier, **kwargs):
     if not html_tag:
         return None
 
-    if kwargs.get("div"):
-        html_tag = html_tag.div
-
-    if kwargs.get("a"):
-        html_tag = html_tag.a
-
     return html_tag.text.replace("\n", "").strip() if html_tag else None
