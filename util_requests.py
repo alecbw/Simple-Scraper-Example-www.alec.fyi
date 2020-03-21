@@ -69,7 +69,7 @@ def iteratively_test_proxies(proxies, optionalLocation):
     for proxy in proxies:
         result = test_proxy(proxy)
         if result:
-            print('First successful response is: ' + str(proxy))
+            logging.info('First successful response is: ' + str(proxy))
             return proxy, proxies
         else:
             proxies.remove(proxy)
@@ -82,7 +82,7 @@ def asynchronously_test_proxies(inputList):
     taskpool = pool.Pool(size=10)
     for single_task in (taskpool.imap_unordered(test_proxy, inputList, maxsize=1)):
         if single_task:
-            print('First successful response is: ' + str(single_task))
+            logging.info('First successful async response is: ' + str(single_task))
             return single_task
 
 
@@ -93,7 +93,7 @@ def test_proxy(proxy):
         return proxy
 
     except Exception as e:                 # Most free proxies will often get connection errors.
-        print("Skipping. Connnection error on " + str(proxy))
+        logging.info("Skipping. Connnection error on " + str(proxy))
         return None
 
 
@@ -202,11 +202,11 @@ def site_request(url, proxy, wait, **kwargs):
 # This will handle 1) Fetching and Rotating proxies and 2) Handling and Retrying failed requests
 def fully_managed_site_request(url, **kwargs):
     proxies = fetch_proxies()
-    proxy, proxies = rotate_proxies(proxies, location=kwargs.get("location"), async_test=True, clean_url=True)
-    response, status_code = site_request(url, proxy, kwargs.get("wait", 1))
+    proxy, proxies = rotate_proxies(proxies, location=kwargs.get("location"), async_test=True)
+    response, status_code = site_request(url, proxy, kwargs.get("wait", 1), **kwargs)
     while isinstance(response, str): # Returned error messaged
-        proxy, proxies = rotate_proxies(proxies, location=kwargs.get("location"), async_test=True, clean_url=True)
-        response, status_code = site_request(url, proxy, wait=kwargs.get("wait", 0))
+        proxy, proxies = rotate_proxies(proxies, location=kwargs.get("location"), async_test=True)
+        response, status_code = site_request(url, proxy, wait=kwargs.get("wait", 0), **kwargs)
 
     return response, status_code
 

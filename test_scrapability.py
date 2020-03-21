@@ -23,8 +23,8 @@ args = argparser.parse_args()
 if __name__ == "__main__":
 
     url = "https://en.wikipedia.org/wiki/Outline_of_science"
-    if args.export:
-        parsed, status_code = fully_managed_site_request(url)
+    if args.use_proxy:
+        parsed, status_code = fully_managed_site_request(url, soup=True)
     else:
         parsed, status_code = site_request(url=url, proxy=None, wait=0, clean_url=True, soup=True)
 
