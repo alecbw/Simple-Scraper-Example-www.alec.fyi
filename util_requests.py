@@ -97,7 +97,7 @@ def test_proxy(proxy):
         return None
 
 
-################################# ~ Outbound Requests ~ ####################################
+################################# ~ Header Modification ~ ####################################
 
 
 # Mock a series of different browser / OS types
@@ -147,6 +147,9 @@ def rotate_language():
 def rotate_accept():
     accepts = ["text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"]
     return random.choice(accepts)
+
+
+################################# ~ Outbound Requests ~ ####################################
 
 
 # Mock a browser and visit a site
@@ -204,6 +207,7 @@ def fully_managed_site_request(url, **kwargs):
     proxies = fetch_proxies()
     proxy, proxies = rotate_proxies(proxies, location=kwargs.get("location"), async_test=True)
     response, status_code = site_request(url, proxy, kwargs.get("wait", 1), **kwargs)
+
     while isinstance(response, str): # Returned error messaged
         proxy, proxies = rotate_proxies(proxies, location=kwargs.get("location"), async_test=True)
         response, status_code = site_request(url, proxy, wait=kwargs.get("wait", 0), **kwargs)
@@ -226,8 +230,9 @@ def flatten_multiple_selectors(enclosing_element, selector_type, **kwargs):
         return ", ".join(textlist)
     return textlist
 
+
 # Will extract the text from, and concatenate together, all child elements of a given selector
-def flatten_neigboring_selectors(enclosing_element, selector_type, output):
+def flatten_neigboring_selectors(enclosing_element, selector_type, **kwargs):
     textlist = []
 
     for ele in enclosing_element.findAll(selector_type):
@@ -238,10 +243,10 @@ def flatten_neigboring_selectors(enclosing_element, selector_type, output):
         if text:
             textlist.append(text)
 
-    if output == "str":
+    if kwargs.get("output_str"):
         return ", ".join(textlist)
-    elif output == "list":
-        return textlist
+    return textlist
+
 
 # A safer way to execute a find -> .get_text() statement e.g. parsed.find('div', {class : 'example'})
 def safely_get_text(parsed, html_type, property_type, identifier, **kwargs):
