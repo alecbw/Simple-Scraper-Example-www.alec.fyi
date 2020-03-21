@@ -63,6 +63,7 @@ def rotate_proxies(inputProxyList, **kwargs):
 
     return proxy, proxies
 
+
 # Test proxies, one by one
 def iteratively_test_proxies(proxies, optionalLocation):
     for proxy in proxies:
@@ -153,6 +154,11 @@ def site_request(url, proxy, wait, **kwargs):
     if wait and wait != 0:
         sleep(random.uniform(wait, wait+1))    # +/- 0.5 sec from specified wait time. Pseudorandomized.
 
+    if kwargs.get("clean_url"):
+        url = url.split("://", 1)[1] if "://" in url else url
+        url = url.split("www.", 1)[1] if "www." in url else url
+        url = "https://" + url
+
     # Spoof a typical browser header. HTTP Headers are case-insensitive.
     headers = {
         'user-agent': kwargs.get("agent", rotate_agent()),
@@ -196,15 +202,16 @@ def site_request(url, proxy, wait, **kwargs):
 # This will handle 1) Fetching and Rotating proxies and 2) Handling and Retrying failed requests
 def fully_managed_site_request(url, **kwargs):
     proxies = fetch_proxies()
-    proxy, proxies = rotate_proxies(proxies, location=kwargs.get("location"), async_test=True)
+    proxy, proxies = rotate_proxies(proxies, location=kwargs.get("location"), async_test=True, clean_url=True)
     response, status_code = site_request(url, proxy, kwargs.get("wait", 1))
     while isinstance(response, str): # Returned error messaged
-        proxy, proxies = rotate_proxies(proxies, location=kwargs.get("location"), async_test=True)
+        proxy, proxies = rotate_proxies(proxies, location=kwargs.get("location"), async_test=True, clean_url=True)
         response, status_code = site_request(url, proxy, wait=kwargs.get("wait", 0))
 
     return response, status_code
 
 
+# Will extract the text from, and concatenate together, all elements of a given selector
 def flatten_multiple_selectors(enclosing_element, selector_type, **kwargs):
     textlist = []
 
@@ -219,7 +226,7 @@ def flatten_multiple_selectors(enclosing_element, selector_type, **kwargs):
         return ", ".join(textlist)
     return textlist
 
-
+# Will extract the text from, and concatenate together, all child elements of a given selector
 def flatten_neigboring_selectors(enclosing_element, selector_type, output):
     textlist = []
 
@@ -236,7 +243,7 @@ def flatten_neigboring_selectors(enclosing_element, selector_type, output):
     elif output == "list":
         return textlist
 
-
+# A safer way to execute a find -> .get_text() statement e.g. parsed.find('div', {class : 'example'})
 def safely_get_text(parsed, html_type, property_type, identifier, **kwargs):
     if not parsed:
         return None
