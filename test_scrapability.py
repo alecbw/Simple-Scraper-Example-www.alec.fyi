@@ -1,6 +1,5 @@
 from util_requests import rotate_proxies, site_request, fully_managed_site_request
 
-
 import csv
 import argparse
 import random
